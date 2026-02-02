@@ -41,15 +41,19 @@ export function Navbar() {
 
         {/* Right side buttons */}
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            className="text-gray-500 hover:text-foreground hover:bg-white/5 transition-all duration-200 rounded-full"
-          >
-            Log In
-          </Button>
-          <Button className="bg-foreground text-background hover:bg-gray-200 rounded-full font-medium transition-all duration-200 transform hover:scale-105">
-            Get Started
-          </Button>
+          <Link href="/login">
+            <Button
+              variant="ghost"
+              className="text-gray-500 hover:text-foreground hover:bg-white/5 transition-all duration-200 rounded-full"
+            >
+              Log In
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button className="bg-foreground text-background hover:bg-gray-200 rounded-full font-medium transition-all duration-200 transform hover:scale-105">
+              Get Started
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

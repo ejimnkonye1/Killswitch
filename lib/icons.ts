@@ -1,0 +1,71 @@
+import {
+  SiNetflix, SiSpotify, SiYoutube,
+  SiApple, SiAmazon, SiHbo,
+  SiPlaystation, SiNintendoswitch,
+  SiAdobe, SiGoogle,
+  SiDropbox, SiNotion, SiSlack,
+  SiGithub, SiLinear, SiFigma,
+  SiOpenai, SiTwitch, SiDiscord,
+} from 'react-icons/si'
+import { FiDollarSign, FiTv, FiMonitor, FiPlay } from 'react-icons/fi'
+import type { IconType } from 'react-icons'
+
+export const iconMap: Record<string, IconType> = {
+  netflix: SiNetflix,
+  spotify: SiSpotify,
+  youtube: SiYoutube,
+  'youtube premium': SiYoutube,
+  'youtube music': SiYoutube,
+  'disney+': FiTv,
+  'disney plus': FiTv,
+  disneyplus: FiTv,
+  'apple music': SiApple,
+  'apple tv+': SiApple,
+  'apple tv': SiApple,
+  'apple one': SiApple,
+  icloud: SiApple,
+  'icloud+': SiApple,
+  'amazon prime': SiAmazon,
+  'prime video': SiAmazon,
+  amazon: SiAmazon,
+  hbo: SiHbo,
+  'hbo max': SiHbo,
+  hulu: FiPlay,
+  playstation: SiPlaystation,
+  'ps plus': SiPlaystation,
+  'playstation plus': SiPlaystation,
+  xbox: FiMonitor,
+  'xbox game pass': FiMonitor,
+  'game pass': FiMonitor,
+  'nintendo switch online': SiNintendoswitch,
+  nintendo: SiNintendoswitch,
+  'adobe creative cloud': SiAdobe,
+  adobe: SiAdobe,
+  photoshop: SiAdobe,
+  'microsoft 365': FiMonitor,
+  microsoft: FiMonitor,
+  office: FiMonitor,
+  'google one': SiGoogle,
+  'google workspace': SiGoogle,
+  google: SiGoogle,
+  dropbox: SiDropbox,
+  notion: SiNotion,
+  slack: SiSlack,
+  github: SiGithub,
+  'github copilot': SiGithub,
+  linear: SiLinear,
+  figma: SiFigma,
+  chatgpt: SiOpenai,
+  'chatgpt plus': SiOpenai,
+  openai: SiOpenai,
+  twitch: SiTwitch,
+  discord: SiDiscord,
+  'discord nitro': SiDiscord,
+}
+
+export function getSubscriptionIcon(name: string): IconType {
+  const key = name.toLowerCase().trim()
+  return iconMap[key] || FiDollarSign
+}
+
+export const defaultIcon = FiDollarSign
