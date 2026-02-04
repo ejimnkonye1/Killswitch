@@ -65,8 +65,8 @@ export function PortfolioHealth({ subscriptions }: PortfolioHealthProps) {
       </div>
 
       {/* Score Circle */}
-      <div className="flex items-center gap-6 mb-4">
-        <div className="relative">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-4">
+        <div className="relative flex-shrink-0">
           <svg className="w-20 h-20 transform -rotate-90">
             {/* Background circle */}
             <circle
@@ -106,13 +106,13 @@ export function PortfolioHealth({ subscriptions }: PortfolioHealthProps) {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 text-center sm:text-left">
           <p className={`text-sm mb-2 ${isDark ? 'text-[#888888]' : 'text-gray-600'}`}>
             {getStatusText()}
           </p>
 
           {/* Breakdown */}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-3">
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-green-400" />
               <span className={`text-xs ${isDark ? 'text-[#666666]' : 'text-gray-500'}`}>

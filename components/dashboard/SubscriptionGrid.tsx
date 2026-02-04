@@ -44,16 +44,16 @@ export function SubscriptionGrid({
           <span className={`text-xs ${isDark ? 'text-[#555555]' : 'text-gray-600'}`}>({filtered.length})</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search */}
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-initial">
             <FiSearch className={`absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${isDark ? 'text-[#444444]' : 'text-gray-400'}`} />
             <input
               type="text"
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`text-xs rounded-lg pl-9 pr-3 py-2 w-48 focus:outline-none transition-colors ${
+              className={`text-xs rounded-lg pl-9 pr-3 py-2 w-full sm:w-32 md:w-40 lg:w-48 focus:outline-none transition-colors ${
                 isDark
                   ? 'bg-[#0A0A0A] border border-[#1A1A1A] text-white placeholder:text-[#444444] focus:border-[#333333]'
                   : 'bg-white border border-gray-300 text-black placeholder:text-gray-400 focus:border-gray-500'
@@ -62,16 +62,16 @@ export function SubscriptionGrid({
           </div>
 
           {/* Filter */}
-          <div className={`flex items-center rounded-lg p-0.5 ${
-            isDark 
-              ? 'bg-[#0A0A0A] border border-[#1A1A1A]' 
+          <div className={`flex items-center rounded-lg p-0.5 overflow-x-auto ${
+            isDark
+              ? 'bg-[#0A0A0A] border border-[#1A1A1A]'
               : 'bg-gray-50 border border-gray-300'
           }`}>
             {(['all', 'active', 'trial', 'cancelled'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`text-xs px-3 py-1.5 rounded-md capitalize transition-all duration-200 ${
+                className={`text-xs px-3 py-1.5 rounded-md capitalize transition-all duration-200 whitespace-nowrap ${
                   filter === f
                     ? isDark
                       ? 'bg-[#111111] text-white'

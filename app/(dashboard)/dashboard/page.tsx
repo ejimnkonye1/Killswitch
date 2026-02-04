@@ -135,8 +135,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts, Renewals, and Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="md:col-span-2 lg:col-span-2">
           <SpendingChart subscriptions={subscriptions} />
         </div>
         <div className="space-y-4">

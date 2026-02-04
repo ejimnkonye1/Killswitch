@@ -159,10 +159,17 @@
   }
 }
 
-/* Custom Scrollbar - Outside layer for higher specificity */
+/* Custom Scrollbar - Theme-aware */
 html {
   scrollbar-width: thin;
-  scrollbar-color: #333333 transparent;
+}
+
+html.dark {
+  scrollbar-color: #222222 transparent;
+}
+
+html:not(.dark) {
+  scrollbar-color: #e0e0e0 transparent;
 }
 
 html::-webkit-scrollbar {
@@ -174,13 +181,22 @@ html::-webkit-scrollbar-track {
   background: transparent;
 }
 
-html::-webkit-scrollbar-thumb {
-  background: #333333;
+html.dark::-webkit-scrollbar-thumb {
+  background: #222222;
   border-radius: 4px;
 }
 
-html::-webkit-scrollbar-thumb:hover {
-  background: #444444;
+html.dark::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+html:not(.dark)::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+html:not(.dark)::-webkit-scrollbar-thumb:hover {
+  background: #cccccc;
 }
 
 body::-webkit-scrollbar {
@@ -192,13 +208,22 @@ body::-webkit-scrollbar-track {
   background: transparent;
 }
 
-body::-webkit-scrollbar-thumb {
-  background: #333333;
+body.dark::-webkit-scrollbar-thumb {
+  background: #222222;
   border-radius: 4px;
 }
 
-body::-webkit-scrollbar-thumb:hover {
-  background: #444444;
+body.dark::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+body:not(.dark)::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+body:not(.dark)::-webkit-scrollbar-thumb:hover {
+  background: #cccccc;
 }
 
 /* Custom animations */
