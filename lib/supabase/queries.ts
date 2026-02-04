@@ -67,15 +67,15 @@ export async function createSubscription(formData: SubscriptionFormData) {
     const reminderDate = new Date(renewalDate)
     reminderDate.setDate(reminderDate.getDate() - daysBefore)
 
-    if (reminderDate > new Date()) {
-      await supabase.from('reminders').insert({
-        user_id: userId,
-        subscription_id: data.id,
-        reminder_type: 'renewal',
-        reminder_date: reminderDate.toISOString(),
-        is_sent: false,
-      })
-    }
+    // Always create reminder - if it's in the past, it will trigger immediately
+    // This ensures users get notified even for imminent renewals
+    await supabase.from('reminders').insert({
+      user_id: userId,
+      subscription_id: data.id,
+      reminder_type: 'renewal',
+      reminder_date: reminderDate.toISOString(),
+      is_sent: false,
+    })
 
     // Auto-create trial reminder if trial subscription
     if (formData.status === 'trial' && formData.trial_end_date) {
@@ -83,15 +83,13 @@ export async function createSubscription(formData: SubscriptionFormData) {
       const trialReminder = new Date(trialEnd)
       trialReminder.setDate(trialReminder.getDate() - daysBefore)
 
-      if (trialReminder > new Date()) {
-        await supabase.from('reminders').insert({
-          user_id: userId,
-          subscription_id: data.id,
-          reminder_type: 'trial_ending',
-          reminder_date: trialReminder.toISOString(),
-          is_sent: false,
-        })
-      }
+      await supabase.from('reminders').insert({
+        user_id: userId,
+        subscription_id: data.id,
+        reminder_type: 'trial_ending',
+        reminder_date: trialReminder.toISOString(),
+        is_sent: false,
+      })
     }
   }
 
@@ -135,20 +133,18 @@ export async function bulkCreateSubscriptions(
     if (data) {
       created++
 
-      // Auto-create reminder before renewal
+      // Auto-create reminder before renewal (always, even if in the past)
       const renewalDate = new Date(formData.renewal_date)
       const reminderDate = new Date(renewalDate)
       reminderDate.setDate(reminderDate.getDate() - daysBefore)
 
-      if (reminderDate > new Date()) {
-        await supabase.from('reminders').insert({
-          user_id: userId,
-          subscription_id: data.id,
-          reminder_type: 'renewal',
-          reminder_date: reminderDate.toISOString(),
-          is_sent: false,
-        })
-      }
+      await supabase.from('reminders').insert({
+        user_id: userId,
+        subscription_id: data.id,
+        reminder_type: 'renewal',
+        reminder_date: reminderDate.toISOString(),
+        is_sent: false,
+      })
     }
   }
 
@@ -188,20 +184,18 @@ export async function updateSubscription(id: string, formData: Partial<Subscript
       .single()
     const daysBefore = prefs?.reminder_days_before ?? 2
 
-    // Create new renewal reminder
+    // Create new renewal reminder (always, even if in the past)
     const renewalDate = new Date(formData.renewal_date)
     const reminderDate = new Date(renewalDate)
     reminderDate.setDate(reminderDate.getDate() - daysBefore)
 
-    if (reminderDate > new Date()) {
-      await supabase.from('reminders').insert({
-        user_id: userId,
-        subscription_id: id,
-        reminder_type: 'renewal',
-        reminder_date: reminderDate.toISOString(),
-        is_sent: false,
-      })
-    }
+    await supabase.from('reminders').insert({
+      user_id: userId,
+      subscription_id: id,
+      reminder_type: 'renewal',
+      reminder_date: reminderDate.toISOString(),
+      is_sent: false,
+    })
   }
 
   return { data: data as Subscription | null, error }
@@ -385,6 +379,90 @@ export async function upsertUserPreferences(
     .single()
 
   return { data: data as UserPreferences | null, error }
+}
+
+// ─── Reminder Backfill ──────────────────────────────────────────
+
+export async function backfillMissingReminders() {
+  const supabase = createClient()
+  const userId = await getCurrentUserId()
+  if (!userId) return { created: 0, error: { message: 'Not authenticated' } }
+
+  // Get user's preferred reminder advance days
+  const { data: prefs } = await supabase
+    .from('user_preferences')
+    .select('reminder_days_before')
+    .eq('user_id', userId)
+    .single()
+  const daysBefore = prefs?.reminder_days_before ?? 2
+
+  // Get all active/trial subscriptions
+  const { data: subs, error: subsError } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .in('status', ['active', 'trial'])
+
+  if (subsError || !subs) {
+    return { created: 0, error: subsError }
+  }
+
+  let createdCount = 0
+
+  for (const sub of subs) {
+    // Check if there's already an unsent reminder for this subscription
+    const { data: existingReminder } = await supabase
+      .from('reminders')
+      .select('id')
+      .eq('subscription_id', sub.id)
+      .eq('reminder_type', 'renewal')
+      .eq('is_sent', false)
+      .single()
+
+    if (!existingReminder) {
+      // Create reminder for this subscription
+      const renewalDate = new Date(sub.renewal_date)
+      const reminderDate = new Date(renewalDate)
+      reminderDate.setDate(reminderDate.getDate() - daysBefore)
+
+      await supabase.from('reminders').insert({
+        user_id: userId,
+        subscription_id: sub.id,
+        reminder_type: 'renewal',
+        reminder_date: reminderDate.toISOString(),
+        is_sent: false,
+      })
+      createdCount++
+    }
+
+    // Check for trial reminder if needed
+    if (sub.status === 'trial' && sub.trial_end_date) {
+      const { data: existingTrialReminder } = await supabase
+        .from('reminders')
+        .select('id')
+        .eq('subscription_id', sub.id)
+        .eq('reminder_type', 'trial_ending')
+        .eq('is_sent', false)
+        .single()
+
+      if (!existingTrialReminder) {
+        const trialEnd = new Date(sub.trial_end_date)
+        const trialReminder = new Date(trialEnd)
+        trialReminder.setDate(trialReminder.getDate() - daysBefore)
+
+        await supabase.from('reminders').insert({
+          user_id: userId,
+          subscription_id: sub.id,
+          reminder_type: 'trial_ending',
+          reminder_date: trialReminder.toISOString(),
+          is_sent: false,
+        })
+        createdCount++
+      }
+    }
+  }
+
+  return { created: createdCount, error: null }
 }
 
 // ─── Renewal Advancement ─────────────────────────────────────────

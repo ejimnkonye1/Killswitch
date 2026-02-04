@@ -57,11 +57,11 @@ export function HowItWorks() {
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
                 viewport={{ once: true }}
-                className="group p-8 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl hover:border-[#333333] transition-all duration-300 hover:-translate-y-1"
+                className="group p-8 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl hover:border-[#333333] transition-all duration-300 hover:-translate-y-2"
               >
                 {/* Step Number */}
                 <div className="text-5xl font-light text-gray-600 mb-6 group-hover:text-gray-500 transition-colors duration-300">
@@ -69,7 +69,7 @@ export function HowItWorks() {
                 </div>
 
                 {/* Icon */}
-                <div className="mb-6">
+                <div className="mb-6 transition-transform duration-300 group-hover:scale-110">
                   <Icon className="w-12 h-12 text-white group-hover:text-gray-300 transition-colors duration-300" strokeWidth={1.5} />
                 </div>
 

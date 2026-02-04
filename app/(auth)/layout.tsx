@@ -1,19 +1,18 @@
 'use client'
 
 import { StarfieldBackground } from '@/components/StarfieldBackground'
-import { useTheme } from '@/lib/theme-context'
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { isDark } = useTheme()
-  
   return (
-    <div className={isDark ? 'min-h-screen bg-black flex items-center justify-center px-4' : 'min-h-screen bg-white flex items-center justify-center px-4'}>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 relative overflow-hidden">
       <StarfieldBackground />
-      {children}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
   )
 }

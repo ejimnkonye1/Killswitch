@@ -7,7 +7,7 @@ import { StarfieldBackground } from '@/components/StarfieldBackground'
 
 export function Hero() {
   return (
-    <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center relative bg-[#0a0a0a] overflow-hidden">
+    <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center relative overflow-hidden">
       <StarfieldBackground />
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* Main Heading */}

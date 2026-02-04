@@ -17,6 +17,8 @@ export function useReminders() {
       return
     }
 
+    // Fetch all unsent reminders (past and upcoming within 7 days)
+    // Past reminders should be shown immediately as they need attention
     const weekFromNow = new Date(
       Date.now() + 7 * 24 * 60 * 60 * 1000
     ).toISOString()
@@ -26,7 +28,7 @@ export function useReminders() {
       .select('*, subscription:subscriptions(*)')
       .eq('user_id', user.id)
       .eq('is_sent', false)
-      .lte('reminder_date', weekFromNow)
+      .lte('reminder_date', weekFromNow) // Include all unsent reminders up to 7 days from now
       .order('reminder_date', { ascending: true })
 
     if (!error && data) {

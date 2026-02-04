@@ -49,9 +49,8 @@ export function StarfieldBackground() {
     let animationId: number
 
     const animate = () => {
-      // Clear canvas with black background
-      ctx.fillStyle = '#000000'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // Clear canvas with transparent background
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Update and draw stars
       stars.forEach((star) => {
@@ -86,7 +85,7 @@ export function StarfieldBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10"
+      className="absolute inset-0 z-0"
     />
   )
 }

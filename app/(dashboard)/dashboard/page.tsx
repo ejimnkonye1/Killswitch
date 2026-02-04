@@ -13,6 +13,9 @@ import { SubscriptionGrid } from '@/components/dashboard/SubscriptionGrid'
 import { AddSubscriptionModal } from '@/components/dashboard/AddSubscriptionModal'
 import { BudgetProgressBar } from '@/components/dashboard/BudgetProgressBar'
 import { BudgetAlert } from '@/components/ui/BudgetAlert'
+import { PortfolioHealth } from '@/components/dashboard/PortfolioHealth'
+import { Graveyard } from '@/components/dashboard/Graveyard'
+import { ShareSavings } from '@/components/dashboard/ShareSavings'
 import { deleteSubscription } from '@/lib/supabase/queries'
 import type { Subscription } from '@/lib/types'
 
@@ -79,13 +82,19 @@ export default function DashboardPage() {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        
-        <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Dashboard</h1>
-        <p className={`text-sm mt-1 ${isDark ? 'text-[#555555]' : 'text-[#999999]'}`}>
-          Manage and track all your subscriptions
-        </p>
+        <div>
+          <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Dashboard</h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-[#555555]' : 'text-[#999999]'}`}>
+            Manage and track all your subscriptions
+          </p>
+        </div>
+        <ShareSavings
+          totalSavings={cancelledSavings}
+          subscriptionCount={activeCount}
+          cancelledCount={subscriptions.filter(s => s.status === 'cancelled').length}
+        />
       </motion.div>
 
       {/* Error banner */}
@@ -125,12 +134,16 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Charts and Renewals */}
+      {/* Charts, Renewals, and Health */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <div className="lg:col-span-2">
           <SpendingChart subscriptions={subscriptions} />
         </div>
-        <UpcomingRenewals subscriptions={subscriptions} />
+        <div className="space-y-4">
+          <UpcomingRenewals subscriptions={subscriptions} />
+          <PortfolioHealth subscriptions={subscriptions} />
+          <Graveyard subscriptions={subscriptions} onRevive={refetch} />
+        </div>
       </div>
 
       {/* Subscriptions Grid */}
@@ -164,6 +177,7 @@ export default function DashboardPage() {
         onClose={handleCloseModal}
         onSaved={refetch}
         editSubscription={editingSub}
+        existingSubscriptions={subscriptions}
       />
     </>
   )

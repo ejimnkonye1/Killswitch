@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { advanceOverdueSubscriptions } from '@/lib/supabase/queries'
+import { advanceOverdueSubscriptions, backfillMissingReminders } from '@/lib/supabase/queries'
 import type { Subscription } from '@/lib/types'
 
 export function useSubscriptions() {
@@ -12,6 +12,7 @@ export function useSubscriptions() {
   const supabaseRef = useRef(createClient())
   const userIdRef = useRef<string | null>(null)
   const advancingRef = useRef(false)
+  const backfillRef = useRef(false)
 
   const fetchSubscriptions = useCallback(async () => {
     // Skip re-fetch if we're currently advancing renewal dates
@@ -98,6 +99,22 @@ export function useSubscriptions() {
       if (channel) supabase.removeChannel(channel)
     }
   }, [fetchSubscriptions])
+
+  // Backfill missing reminders on mount
+  useEffect(() => {
+    if (backfillRef.current) return
+    backfillRef.current = true
+
+    const backfill = async () => {
+      try {
+        await backfillMissingReminders()
+      } catch (error) {
+        console.error('Failed to backfill reminders:', error)
+      }
+    }
+
+    backfill()
+  }, [])
 
   const activeSubscriptions = subscriptions.filter(
     (s) => s.status === 'active' || s.status === 'trial'

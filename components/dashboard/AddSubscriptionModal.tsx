@@ -13,6 +13,7 @@ interface AddSubscriptionModalProps {
   onClose: () => void
   onSaved: () => void
   editSubscription?: Subscription | null
+  existingSubscriptions?: Subscription[]
 }
 
 const suggestions = [
@@ -100,6 +101,7 @@ export function AddSubscriptionModal({
   onClose,
   onSaved,
   editSubscription,
+  existingSubscriptions = [],
 }: AddSubscriptionModalProps) {
   const { isDark } = useTheme()
   const [loading, setLoading] = useState(false)
@@ -107,6 +109,8 @@ export function AddSubscriptionModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [formError, setFormError] = useState('')
+  const [duplicateWarning, setDuplicateWarning] = useState<Subscription | null>(null)
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false)
 
   const [name, setName] = useState('')
   const [category, setCategory] = useState('Entertainment')
@@ -150,11 +154,52 @@ export function AddSubscriptionModal({
     setCancellationLink('')
     setNotes('')
     setShowDeleteConfirm(false)
+    setDuplicateWarning(null)
+    setShowDuplicateModal(false)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Check for duplicate subscriptions
+  const checkForDuplicate = (inputName: string): Subscription | null => {
+    if (isEditing) return null // Don't check duplicates when editing
+
+    const normalizedInput = inputName.toLowerCase().trim()
+    if (!normalizedInput) return null
+
+    // Exact match
+    const exactMatch = existingSubscriptions.find(
+      s => s.name.toLowerCase().trim() === normalizedInput
+    )
+    if (exactMatch) return exactMatch
+
+    // Similar match (contains or is contained)
+    const similarMatch = existingSubscriptions.find(s => {
+      const existingName = s.name.toLowerCase().trim()
+      return existingName.includes(normalizedInput) || normalizedInput.includes(existingName)
+    })
+    if (similarMatch) return similarMatch
+
+    return null
+  }
+
+  const handleNameChange = (value: string) => {
+    setName(value)
+    setShowSuggestions(true)
+
+    // Check for duplicates with debounce
+    const duplicate = checkForDuplicate(value)
+    setDuplicateWarning(duplicate)
+  }
+
+  const handleSubmit = async (e: React.FormEvent, skipDuplicateCheck = false) => {
     e.preventDefault()
     setFormError('')
+
+    // Check for duplicate before submitting (unless we're skipping the check)
+    if (!skipDuplicateCheck && !isEditing && duplicateWarning) {
+      setShowDuplicateModal(true)
+      return
+    }
+
     setLoading(true)
 
     const formData: SubscriptionFormData = {
@@ -190,6 +235,11 @@ export function AddSubscriptionModal({
     resetForm()
   }
 
+  const handleProceedWithDuplicate = (e: React.FormEvent) => {
+    setShowDuplicateModal(false)
+    handleSubmit(e, true)
+  }
+
   const handleDelete = async () => {
     if (!editSubscription) return
     setFormError('')
@@ -214,6 +264,7 @@ export function AddSubscriptionModal({
   const PreviewIcon = getSubscriptionIcon(name)
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -328,20 +379,32 @@ export function AddSubscriptionModal({
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => {
-                      setName(e.target.value)
-                      setShowSuggestions(true)
-                    }}
+                    onChange={(e) => handleNameChange(e.target.value)}
                     onFocus={() => setShowSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     placeholder="e.g., Netflix, Spotify"
                     required
                     className={`w-full rounded-lg px-3 py-2.5 text-sm transition-all focus:outline-none focus:ring-1 ${
+                      duplicateWarning && !isEditing
+                        ? 'border-yellow-500/50 focus:border-yellow-500 focus:ring-yellow-500/30'
+                        : ''
+                    } ${
                       isDark
                         ? 'bg-[#0D0D0D] border border-[#1F1F1F] text-white placeholder:text-[#444444] focus:border-[#444444] focus:ring-[#333333]'
                         : 'bg-gray-100 border border-gray-300 text-black placeholder:text-gray-500 focus:border-gray-500 focus:ring-gray-400'
                     }`}
                   />
+                  {/* Duplicate warning */}
+                  {duplicateWarning && !isEditing && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-yellow-500 mt-1 flex items-center gap-1"
+                    >
+                      <span>⚠️</span>
+                      Similar subscription exists: {duplicateWarning.name}
+                    </motion.p>
+                  )}
                   {showSuggestions && filteredSuggestions.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
@@ -702,5 +765,76 @@ export function AddSubscriptionModal({
         </motion.div>
       )}
     </AnimatePresence>
+
+      {/* Duplicate Warning Modal */}
+      <AnimatePresence>
+        {showDuplicateModal && duplicateWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowDuplicateModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className={`relative rounded-2xl w-full max-w-sm p-6 shadow-2xl border ${
+                isDark
+                  ? 'bg-[#0A0A0A] border-[#1A1A1A]'
+                  : 'bg-white border-gray-300'
+              }`}
+            >
+              <div className="text-center mb-6">
+                <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                  isDark ? 'bg-yellow-500/10' : 'bg-yellow-100'
+                }`}>
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <h3 className={`font-semibold text-lg mb-2 ${isDark ? 'text-white' : 'text-black'}`}>
+                  Duplicate Subscription
+                </h3>
+                <p className={`text-sm ${isDark ? 'text-[#888888]' : 'text-gray-600'}`}>
+                  You already have <span className="font-medium">{duplicateWarning.name}</span> in your subscriptions.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  onClick={(e) => handleProceedWithDuplicate(e)}
+                  className={`w-full text-sm font-medium px-4 py-2.5 rounded-lg transition-all ${
+                    isDark
+                      ? 'bg-white text-black hover:bg-gray-100'
+                      : 'bg-black text-white hover:bg-gray-900'
+                  }`}
+                >
+                  Add Anyway
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDuplicateModal(false)
+                    onClose()
+                  }}
+                  className={`w-full text-sm font-medium px-4 py-2.5 rounded-lg border transition-all ${
+                    isDark
+                      ? 'border-[#1A1A1A] text-[#888888] hover:text-white hover:border-[#333333]'
+                      : 'border-gray-300 text-gray-600 hover:text-black hover:border-gray-400'
+                  }`}
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

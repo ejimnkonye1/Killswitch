@@ -104,6 +104,7 @@ export function SubscriptionGrid({
               <SubscriptionCard
                 key={sub.id}
                 subscription={sub}
+                allSubscriptions={subscriptions}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 index={i}

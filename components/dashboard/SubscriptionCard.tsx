@@ -1,15 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { FiEdit2, FiTrash2 } from 'react-icons/fi'
+import { motion, AnimatePresence } from 'framer-motion'
+import { FiEdit2, FiTrash2, FiHeart, FiInfo } from 'react-icons/fi'
 import { getSubscriptionIcon } from '@/lib/icons'
 import { useTheme } from '@/lib/theme-context'
 import { useCurrency } from '@/contexts/CurrencyContext'
+import { calculateHealthScore, getHealthScoreColor, getHealthScoreBgColor } from '@/lib/healthScore'
 import type { Subscription } from '@/lib/types'
 
 interface SubscriptionCardProps {
   subscription: Subscription
+  allSubscriptions: Subscription[]
   onEdit: (subscription: Subscription) => void
   onDelete: (id: string) => void
   index: number
@@ -29,12 +32,15 @@ const statusStylesLight: Record<string, string> = {
 
 export function SubscriptionCard({
   subscription,
+  allSubscriptions,
   onEdit,
   onDelete,
   index,
 }: SubscriptionCardProps) {
   const { isDark } = useTheme()
   const { formatAmount } = useCurrency()
+  const [showHealthTooltip, setShowHealthTooltip] = useState(false)
+
   const Icon = getSubscriptionIcon(
     subscription.logo_identifier || subscription.name
   )
@@ -49,6 +55,11 @@ export function SubscriptionCard({
     subscription.billing_cycle === 'yearly'
       ? subscription.cost / 12
       : subscription.cost
+
+  // Calculate health score for active subscriptions
+  const healthResult = subscription.status === 'active'
+    ? calculateHealthScore(subscription, allSubscriptions)
+    : null
 
   return (
     <motion.div
@@ -85,16 +96,70 @@ export function SubscriptionCard({
           </div>
         </Link>
 
-        {/* Status badge */}
-        <span
-          className={`text-xs px-2 py-1 rounded-full capitalize ${
-            isDark 
-              ? (statusStyles[subscription.status] || statusStyles.active)
-              : (statusStylesLight[subscription.status] || statusStylesLight.active)
-          }`}
-        >
-          {subscription.status}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* Health score badge */}
+          {healthResult && (
+            <div className="relative">
+              <button
+                onMouseEnter={() => setShowHealthTooltip(true)}
+                onMouseLeave={() => setShowHealthTooltip(false)}
+                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-all ${getHealthScoreBgColor(healthResult.score, isDark)}`}
+              >
+                <FiHeart className={`w-3 h-3 ${getHealthScoreColor(healthResult.score, isDark)}`} />
+                <span className={getHealthScoreColor(healthResult.score, isDark)}>{healthResult.score}</span>
+              </button>
+
+              {/* Tooltip */}
+              <AnimatePresence>
+                {showHealthTooltip && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    className={`absolute right-0 top-full mt-2 w-56 p-3 rounded-xl z-50 shadow-xl border ${
+                      isDark
+                        ? 'bg-[#111111] border-[#222222]'
+                        : 'bg-white border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <FiInfo className={`w-4 h-4 ${isDark ? 'text-[#666666]' : 'text-gray-500'}`} />
+                      <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-black'}`}>Health Score</span>
+                    </div>
+                    <p className={`text-xs mb-2 ${isDark ? 'text-[#888888]' : 'text-gray-600'}`}>
+                      {healthResult.recommendation}
+                    </p>
+                    <div className={`text-xs space-y-1 pt-2 border-t ${isDark ? 'border-[#222222]' : 'border-gray-200'}`}>
+                      <div className="flex justify-between">
+                        <span className={isDark ? 'text-[#666666]' : 'text-gray-500'}>Usage</span>
+                        <span className={isDark ? 'text-[#999999]' : 'text-gray-700'}>{healthResult.breakdown.usageScore}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className={isDark ? 'text-[#666666]' : 'text-gray-500'}>Value</span>
+                        <span className={isDark ? 'text-[#999999]' : 'text-gray-700'}>{healthResult.breakdown.valueScore}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className={isDark ? 'text-[#666666]' : 'text-gray-500'}>Age</span>
+                        <span className={isDark ? 'text-[#999999]' : 'text-gray-700'}>{healthResult.breakdown.ageScore}%</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Status badge */}
+          <span
+            className={`text-xs px-2 py-1 rounded-full capitalize ${
+              isDark
+                ? (statusStyles[subscription.status] || statusStyles.active)
+                : (statusStylesLight[subscription.status] || statusStylesLight.active)
+            }`}
+          >
+            {subscription.status}
+          </span>
+        </div>
       </div>
 
       {/* Cost */}
