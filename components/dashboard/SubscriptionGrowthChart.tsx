@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '@/lib/theme-context'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import type { Subscription } from '@/lib/types'
@@ -31,7 +31,7 @@ type TimeframeKey = typeof timeframes[number]['key']
 export function SubscriptionGrowthChart({ subscriptions }: SubscriptionGrowthChartProps) {
   const { isDark } = useTheme()
   const { formatAmount, symbol } = useCurrency()
-  const [timeframe, setTimeframe] = useState<TimeframeKey>('30d')
+  const [timeframe, setTimeframe] = useState<TimeframeKey>('7d')
 
   const tf = timeframes.find(t => t.key === timeframe)!
 
@@ -138,57 +138,73 @@ export function SubscriptionGrowthChart({ subscriptions }: SubscriptionGrowthCha
               type="button"
               key={t.key}
               onClick={() => setTimeframe(t.key)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`relative px-2.5 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${
                 timeframe === t.key
                   ? isDark
-                    ? 'bg-[#222222] text-white'
-                    : 'bg-white text-black shadow-sm'
+                    ? 'text-white'
+                    : 'text-black'
                   : isDark
                     ? 'text-[#666666] hover:text-[#999999]'
                     : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              {t.label}
+              {timeframe === t.key && (
+                <motion.div
+                  layoutId="savings-timeframe-indicator"
+                  className={`absolute inset-0 rounded-md ${isDark ? 'bg-[#222222]' : 'bg-white shadow-sm'}`}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{t.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="savingsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1A1A1A' : '#e5e7eb'} vertical={false} />
-            <XAxis
-              dataKey="name"
-              stroke={isDark ? '#444444' : '#9ca3af'}
-              fontSize={11}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke={isDark ? '#444444' : '#9ca3af'}
-              fontSize={11}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `${symbol}${value}`}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="savings"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              fill="url(#savingsGradient)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={timeframe}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="h-64"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="savingsGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1A1A1A' : '#e5e7eb'} vertical={false} />
+              <XAxis
+                dataKey="name"
+                stroke={isDark ? '#444444' : '#9ca3af'}
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke={isDark ? '#444444' : '#9ca3af'}
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${symbol}${value}`}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="savings"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                fill="url(#savingsGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   )
 }
