@@ -58,7 +58,8 @@ export function SubscriptionGrowthChart({ subscriptions }: SubscriptionGrowthCha
           (targetDate.getMonth() - cancelledAt.getMonth())
         // Add partial month based on day of month
         const partialMonth = (targetDate.getDate() - cancelledAt.getDate()) / 30
-        const totalMonths = Math.max(0, monthsDiff + partialMonth)
+        // At minimum count 1 month saved (the next billing cycle avoided)
+        const totalMonths = Math.max(1, monthsDiff + partialMonth)
 
         return total + monthlyCost * totalMonths
       }, 0)
