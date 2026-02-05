@@ -2,6 +2,7 @@ import React from "react"
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/lib/theme-context'
 import { ThemeTransitionWrapper } from '@/components/ThemeTransitionWrapper'
 import './globals.css'
@@ -46,6 +47,7 @@ export default function RootLayout({
           </ThemeTransitionWrapper>
         </ThemeProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

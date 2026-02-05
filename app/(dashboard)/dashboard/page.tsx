@@ -6,8 +6,10 @@ import { FiPlus } from 'react-icons/fi'
 import { useTheme } from '@/lib/theme-context'
 import { useSubscriptions } from '@/hooks/useSubscriptions'
 import { usePreferences } from '@/hooks/usePreferences'
+import { usePriceTrends } from '@/hooks/usePriceTrends'
 import { StatsCards } from '@/components/dashboard/StatsCards'
 import { SpendingChart } from '@/components/dashboard/SpendingChart'
+import { SubscriptionGrowthChart } from '@/components/dashboard/SubscriptionGrowthChart'
 import { UpcomingRenewals } from '@/components/dashboard/UpcomingRenewals'
 import { SubscriptionGrid } from '@/components/dashboard/SubscriptionGrid'
 import { AddSubscriptionModal } from '@/components/dashboard/AddSubscriptionModal'
@@ -18,6 +20,8 @@ import { Graveyard } from '@/components/dashboard/Graveyard'
 import { ShareSavings } from '@/components/dashboard/ShareSavings'
 import { AIAdvisor } from '@/components/dashboard/AIAdvisor'
 import { PriceAlerts } from '@/components/dashboard/PriceAlerts'
+import { ExtensionStatus } from '@/components/dashboard/ExtensionStatus'
+import { EmailReceiptScanner } from '@/components/dashboard/EmailReceiptScanner'
 import { deleteSubscription } from '@/lib/supabase/queries'
 import type { Subscription } from '@/lib/types'
 
@@ -34,8 +38,11 @@ export default function DashboardPage() {
     cancelledSavings,
   } = useSubscriptions()
   const { preferences } = usePreferences()
+  const { trends: priceTrends } = usePriceTrends()
 
   const showBudget = preferences.budget_enabled && preferences.monthly_budget && preferences.monthly_budget > 0
+
+
 
   const [isModalOpening, setIsModalOpening] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -138,8 +145,9 @@ export default function DashboardPage() {
 
       {/* Charts, Renewals, and Health */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="md:col-span-2 lg:col-span-2">
+        <div className="md:col-span-2 lg:col-span-2 space-y-4">
           <SpendingChart subscriptions={subscriptions} />
+          <SubscriptionGrowthChart subscriptions={subscriptions} />
         </div>
         <div className="space-y-4">
           <UpcomingRenewals subscriptions={subscriptions} />
@@ -150,6 +158,8 @@ export default function DashboardPage() {
             totalYearlyProjection={totalYearlyProjection}
           />
           <PriceAlerts />
+          <ExtensionStatus />
+          <EmailReceiptScanner />
           <Graveyard subscriptions={subscriptions} onRevive={refetch} />
         </div>
       </div>
@@ -159,6 +169,7 @@ export default function DashboardPage() {
         subscriptions={subscriptions}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        priceTrends={priceTrends}
       />
 
       {/* FAB - Add button */}

@@ -138,3 +138,51 @@ export interface PriceAlert {
   reportCount: number
   alertType: 'overpaying' | 'underpaying' | 'price_increased' | 'price_decreased'
 }
+
+// Price Trend Types
+export type PriceTrend = 'rising' | 'falling' | 'stable'
+
+export interface PriceTrendInfo {
+  trend: PriceTrend
+  changePercent: number
+  dataPoints: number
+}
+
+export interface PriceHistoryDataPoint {
+  date: string
+  price: number
+}
+
+export interface ServicePriceTimeline {
+  serviceName: string
+  changes: {
+    date: string
+    oldPrice: number
+    newPrice: number
+    changePercent: number
+  }[]
+}
+
+export interface CommunityPriceReport {
+  serviceName: string
+  price: number
+  billingCycle: BillingCycle
+  plan?: string
+}
+
+// Email Receipt Scanner Types
+export interface ScannedReceipt {
+  id: string
+  serviceName: string
+  amount: number
+  billingCycle: BillingCycle
+  date: string
+  email_subject: string
+  confidence: 'high' | 'medium' | 'low'
+}
+
+export interface ReceiptScanResult {
+  success: boolean
+  receipts: ScannedReceipt[]
+  error?: string
+}

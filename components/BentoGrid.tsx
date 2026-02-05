@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TrendingDown, Lock, Bell, BarChart3 } from 'lucide-react'
+import { TrendingDown, Lock, Bell, BarChart3, DollarSign, Globe, Mail } from 'lucide-react'
 
 // Brand Icons
 const SpotifyIcon = () => (
@@ -186,6 +186,127 @@ export function BentoGrid() {
                   viewport={{ once: true }}
                   className="flex-1 bg-gray-600 rounded-t transition-all duration-300 hover:bg-gray-400"
                 />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Card 5: Price Intelligence */}
+          <motion.div
+            variants={itemVariants}
+            className="group p-8 bg-[#0d0d0d] border border-[#1a1a1a] rounded-3xl hover:border-[#333333] hover:scale-[1.02] transition-all duration-300"
+          >
+            <DollarSign className="w-10 h-10 text-white mb-4" strokeWidth={1.5} />
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Price Intelligence
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              Crowdsourced price tracking to ensure you never overpay for any subscription.
+            </p>
+            {/* Animated price comparison visual */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Your price</span>
+                <span className="text-xs text-orange-400 font-medium">$15.99</span>
+              </div>
+              <div className="h-1.5 bg-[#222222] rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-orange-500 rounded-full"
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '80%' }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  viewport={{ once: true }}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Community avg</span>
+                <span className="text-xs text-green-400 font-medium">$12.99</span>
+              </div>
+              <div className="h-1.5 bg-[#222222] rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-green-500 rounded-full"
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '65%' }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  viewport={{ once: true }}
+                />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 6: Auto-Detect */}
+          <motion.div
+            variants={itemVariants}
+            className="group p-8 bg-[#0d0d0d] border border-[#1a1a1a] rounded-3xl hover:border-[#333333] hover:scale-[1.02] transition-all duration-300"
+          >
+            <Globe className="w-10 h-10 text-white mb-4" strokeWidth={1.5} />
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Auto-Detect
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              Browser extension automatically detects subscriptions as you browse the web.
+            </p>
+            {/* Animated detection visual */}
+            <div className="space-y-2">
+              {['netflix.com', 'spotify.com', 'figma.com'].map((domain, i) => (
+                <motion.div
+                  key={domain}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 + i * 0.15 }}
+                  viewport={{ once: true }}
+                  className="flex items-center justify-between p-2 rounded-lg bg-[#111111] border border-[#1a1a1a]"
+                >
+                  <span className="text-xs text-gray-400">{domain}</span>
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.5 + i * 0.15 }}
+                    viewport={{ once: true }}
+                    className="text-xs text-cyan-400 bg-cyan-400/10 px-1.5 py-0.5 rounded"
+                  >
+                    Detected
+                  </motion.span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Card 7: Receipt Scanner - spans 2 cols */}
+          <motion.div
+            variants={itemVariants}
+            className="lg:col-span-2 group p-8 md:p-12 bg-[#0d0d0d] border border-[#1a1a1a] rounded-3xl hover:border-[#333333] hover:scale-[1.02] transition-all duration-300"
+          >
+            <Mail className="w-12 h-12 text-white mb-4" strokeWidth={1.5} />
+            <h3 className="text-2xl font-semibold text-white mb-2">
+              Receipt Scanner
+            </h3>
+            <p className="text-base text-gray-400 max-w-sm mb-8">
+              Paste email receipts and automatically detect subscriptions with pricing details.
+            </p>
+            {/* Animated receipt parsing visual */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { name: 'Netflix', amount: '$22.99', confidence: 'High' },
+                { name: 'Spotify', amount: '$11.99', confidence: 'High' },
+                { name: 'Adobe CC', amount: '$59.99', confidence: 'Medium' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 + i * 0.12 }}
+                  viewport={{ once: true }}
+                  className="p-3 rounded-xl bg-[#111111] border border-[#1a1a1a]"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-white font-medium">{item.name}</span>
+                    <span className="text-xs text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded">
+                      {item.confidence}
+                    </span>
+                  </div>
+                  <span className="text-lg text-white font-bold">{item.amount}</span>
+                  <span className="text-xs text-gray-500 ml-1">/mo</span>
+                </motion.div>
               ))}
             </div>
           </motion.div>

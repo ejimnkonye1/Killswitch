@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiEdit2, FiTrash2, FiHeart, FiInfo } from 'react-icons/fi'
+import { FiEdit2, FiTrash2, FiHeart, FiInfo, FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
 import { getSubscriptionIcon } from '@/lib/icons'
 import { useTheme } from '@/lib/theme-context'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { calculateHealthScore, getHealthScoreColor, getHealthScoreBgColor } from '@/lib/healthScore'
-import type { Subscription } from '@/lib/types'
+import type { Subscription, PriceTrendInfo } from '@/lib/types'
 
 interface SubscriptionCardProps {
   subscription: Subscription
@@ -16,6 +16,7 @@ interface SubscriptionCardProps {
   onEdit: (subscription: Subscription) => void
   onDelete: (id: string) => void
   index: number
+  priceTrend?: PriceTrendInfo
 }
 
 const statusStyles: Record<string, string> = {
@@ -36,6 +37,7 @@ export function SubscriptionCard({
   onEdit,
   onDelete,
   index,
+  priceTrend,
 }: SubscriptionCardProps) {
   const { isDark } = useTheme()
   const { formatAmount } = useCurrency()
@@ -147,6 +149,22 @@ export function SubscriptionCard({
                 )}
               </AnimatePresence>
             </div>
+          )}
+
+          {/* Price trend badge */}
+          {priceTrend && priceTrend.trend !== 'stable' && (
+            <span className={`flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full ${
+              priceTrend.trend === 'rising'
+                ? isDark ? 'bg-red-400/20 text-red-400' : 'bg-red-100 text-red-600'
+                : isDark ? 'bg-green-400/20 text-green-400' : 'bg-green-100 text-green-600'
+            }`}>
+              {priceTrend.trend === 'rising' ? (
+                <FiTrendingUp className="w-3 h-3" />
+              ) : (
+                <FiTrendingDown className="w-3 h-3" />
+              )}
+              {Math.abs(priceTrend.changePercent)}%
+            </span>
           )}
 
           {/* Status badge */}

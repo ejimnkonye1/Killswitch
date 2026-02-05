@@ -5,18 +5,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiGrid, FiSearch } from 'react-icons/fi'
 import { useTheme } from '@/lib/theme-context'
 import { SubscriptionCard } from './SubscriptionCard'
-import type { Subscription } from '@/lib/types'
+import type { Subscription, PriceTrendInfo } from '@/lib/types'
 
 interface SubscriptionGridProps {
   subscriptions: Subscription[]
   onEdit: (subscription: Subscription) => void
   onDelete: (id: string) => void
+  priceTrends?: Record<string, PriceTrendInfo>
 }
 
 export function SubscriptionGrid({
   subscriptions,
   onEdit,
   onDelete,
+  priceTrends,
 }: SubscriptionGridProps) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'active' | 'trial' | 'cancelled'>('all')
@@ -108,6 +110,7 @@ export function SubscriptionGrid({
                 onEdit={onEdit}
                 onDelete={onDelete}
                 index={i}
+                priceTrend={priceTrends?.[sub.id]}
               />
             ))}
           </AnimatePresence>

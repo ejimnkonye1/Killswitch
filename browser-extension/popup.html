@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=360">
+  <title>SubTracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">S</div>
+        <div>
+          <h1>SubTracker</h1>
+          <p class="subtitle">Subscription Detector</p>
+        </div>
+      </div>
+      <div class="badge" id="count-badge">0</div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section" id="settings-section">
+      <div class="section-header">
+        <span class="section-icon">&#9881;</span>
+        <span>API Configuration</span>
+      </div>
+      <div class="input-group">
+        <label>SubTracker API Token</label>
+        <input type="password" id="api-token" placeholder="Paste your token here...">
+        <button class="btn btn-secondary" id="save-token">Save Token</button>
+      </div>
+      <div class="input-group">
+        <label>API URL</label>
+        <input type="text" id="api-url" placeholder="https://your-app.vercel.app" value="">
+      </div>
+      <div id="token-status" class="status-message"></div>
+    </div>
+
+    <!-- Detections -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128269;</span>
+        <span>Detected Services</span>
+        <button class="btn-small" id="clear-btn" title="Clear all">Clear</button>
+      </div>
+      <div id="detections-list" class="detections-list">
+        <div class="empty-state">
+          <p>No subscriptions detected yet.</p>
+          <p class="hint">Browse subscription websites to detect them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
