@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiGrid, FiSearch, FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { FiGrid, FiSearch, FiChevronDown } from 'react-icons/fi'
 import { useTheme } from '@/lib/theme-context'
 import { SubscriptionCard } from './SubscriptionCard'
 import type { Subscription, PriceTrendInfo } from '@/lib/types'
@@ -99,57 +99,106 @@ export function SubscriptionGrid({
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-12 text-center">
-          <p className="text-[#444444] text-sm">
+        <div className={`rounded-2xl p-12 text-center ${isDark ? 'bg-[#0A0A0A] border border-[#1A1A1A]' : 'bg-gray-50 border border-gray-200'}`}>
+          <p className={`text-sm ${isDark ? 'text-[#444444]' : 'text-gray-500'}`}>
             {subscriptions.length === 0
               ? 'No subscriptions yet. Add your first one!'
               : 'No subscriptions match your search.'}
           </p>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            <AnimatePresence>
-              {visible.map((sub, i) => (
-                <SubscriptionCard
+        <div className="relative">
+          {/* Cards grid */}
+          <motion.div
+            layout
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+          >
+            {/* Always-visible cards */}
+            {filtered.slice(0, INITIAL_COUNT).map((sub, i) => (
+              <SubscriptionCard
+                key={sub.id}
+                subscription={sub}
+                allSubscriptions={subscriptions}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                index={i}
+                priceTrend={priceTrends?.[sub.id]}
+              />
+            ))}
+
+            {/* Expandable cards */}
+            <AnimatePresence initial={false}>
+              {expanded && filtered.slice(INITIAL_COUNT).map((sub, i) => (
+                <motion.div
                   key={sub.id}
-                  subscription={sub}
-                  allSubscriptions={subscriptions}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  index={i}
-                  priceTrend={priceTrends?.[sub.id]}
-                />
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: i * 0.04,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                >
+                  <SubscriptionCard
+                    subscription={sub}
+                    allSubscriptions={subscriptions}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    index={INITIAL_COUNT + i}
+                    priceTrend={priceTrends?.[sub.id]}
+                  />
+                </motion.div>
               ))}
             </AnimatePresence>
-          </div>
+          </motion.div>
 
+          {/* Gradient overlay when collapsed */}
+          <AnimatePresence>
+            {hasMore && !expanded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`absolute bottom-0 left-0 right-0 h-32 pointer-events-none rounded-b-2xl ${
+                  isDark
+                    ? 'bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent'
+                    : 'bg-gradient-to-t from-white via-white/80 to-transparent'
+                }`}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Toggle button */}
           {hasMore && (
-            <div className="flex justify-center mt-4">
-              <button
+            <motion.div
+              layout
+              className={`flex justify-center ${expanded ? 'mt-4' : '-mt-2 relative z-10'}`}
+            >
+              <motion.button
                 type="button"
                 onClick={() => setExpanded(!expanded)}
-                className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg border transition-all duration-200 ${
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className={`flex items-center gap-2 text-xs font-medium px-5 py-2.5 rounded-full border transition-colors duration-200 w-full sm:w-auto justify-center ${
                   isDark
-                    ? 'text-[#999999] hover:text-white border-[#1A1A1A] hover:border-[#333333]'
-                    : 'text-gray-600 hover:text-black border-gray-300 hover:border-gray-400'
+                    ? 'text-[#999999] hover:text-white bg-[#0A0A0A] border-[#1A1A1A] hover:border-[#333333]'
+                    : 'text-gray-600 hover:text-black bg-white border-gray-300 hover:border-gray-400'
                 }`}
               >
-                {expanded ? (
-                  <>
-                    <FiChevronUp className="w-3.5 h-3.5" />
-                    Show less
-                  </>
-                ) : (
-                  <>
-                    <FiChevronDown className="w-3.5 h-3.5" />
-                    See more ({filtered.length - INITIAL_COUNT})
-                  </>
-                )}
-              </button>
-            </div>
+                <motion.div
+                  animate={{ rotate: expanded ? 180 : 0 }}
+                  transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                  <FiChevronDown className="w-4 h-4" />
+                </motion.div>
+                {expanded ? 'Show less' : `Show all ${filtered.length} subscriptions`}
+              </motion.button>
+            </motion.div>
           )}
-        </>
+        </div>
       )}
     </motion.div>
   )
