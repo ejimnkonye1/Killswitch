@@ -72,6 +72,15 @@ export async function GET(request: Request) {
         .eq('user_id', userId)
         .single()
 
+      // Check if it's 9 AM in the user's timezone
+      const userTimezone = prefs?.timezone || 'UTC'
+      const nowInUserTz = new Date().toLocaleString('en-US', { timeZone: userTimezone, hour12: false })
+      const userHour = new Date(nowInUserTz).getHours()
+      if (userHour !== 9) {
+        console.log(`[send-reminders] Skipping user ${userId}: local hour is ${userHour} (timezone: ${userTimezone})`)
+        continue
+      }
+
       const emailRenewalEnabled = prefs?.email_reminders_renewal ?? true
       const emailTrialEnabled = prefs?.email_reminders_trial ?? true
 
@@ -132,7 +141,8 @@ export async function GET(request: Request) {
         <div style="background-color: #000000; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           <div style="max-width: 500px; margin: 0 auto;">
             <div style="text-align: center; margin-bottom: 32px;">
-              <div style="display: inline-block; background: #ffffff; width: 40px; height: 40px; border-radius: 8px; line-height: 40px; font-weight: bold; color: #000000; font-size: 18px;">S</div>
+              <div style="display: inline-block; background: #ffffff; width: 48px; height: 48px; border-radius: 10px; line-height: 48px; font-weight: bold; color: #000000; font-size: 18px;">SW</div>
+              <p style="color: #ffffff; font-size: 13px; margin: 6px 0 0 0; font-weight: 600;">SubWise</p>
               <h1 style="color: #ffffff; font-size: 20px; margin: 16px 0 8px 0;">Subscription Reminder</h1>
               <p style="color: #666666; font-size: 14px; margin: 0;">You have upcoming renewals</p>
             </div>

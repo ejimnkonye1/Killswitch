@@ -15,6 +15,33 @@ import { CURRENCIES } from '@/lib/currency'
 import { ImportModal } from '@/components/dashboard/ImportModal'
 import type { Currency } from '@/lib/types'
 
+const TIMEZONES = [
+  { value: 'Pacific/Honolulu', label: '(UTC-10:00) Hawaii' },
+  { value: 'America/Anchorage', label: '(UTC-09:00) Alaska' },
+  { value: 'America/Los_Angeles', label: '(UTC-08:00) Pacific Time' },
+  { value: 'America/Denver', label: '(UTC-07:00) Mountain Time' },
+  { value: 'America/Chicago', label: '(UTC-06:00) Central Time' },
+  { value: 'America/New_York', label: '(UTC-05:00) Eastern Time' },
+  { value: 'America/Halifax', label: '(UTC-04:00) Atlantic Time' },
+  { value: 'America/Sao_Paulo', label: '(UTC-03:00) Sao Paulo' },
+  { value: 'UTC', label: '(UTC+00:00) UTC' },
+  { value: 'Europe/London', label: '(UTC+00:00) London' },
+  { value: 'Europe/Paris', label: '(UTC+01:00) Paris / Berlin' },
+  { value: 'Europe/Helsinki', label: '(UTC+02:00) Helsinki / Cairo' },
+  { value: 'Africa/Lagos', label: '(UTC+01:00) Lagos' },
+  { value: 'Africa/Nairobi', label: '(UTC+03:00) Nairobi' },
+  { value: 'Europe/Moscow', label: '(UTC+03:00) Moscow' },
+  { value: 'Asia/Dubai', label: '(UTC+04:00) Dubai' },
+  { value: 'Asia/Karachi', label: '(UTC+05:00) Karachi' },
+  { value: 'Asia/Kolkata', label: '(UTC+05:30) India' },
+  { value: 'Asia/Dhaka', label: '(UTC+06:00) Dhaka' },
+  { value: 'Asia/Bangkok', label: '(UTC+07:00) Bangkok' },
+  { value: 'Asia/Singapore', label: '(UTC+08:00) Singapore / Hong Kong' },
+  { value: 'Asia/Tokyo', label: '(UTC+09:00) Tokyo' },
+  { value: 'Australia/Sydney', label: '(UTC+10:00) Sydney' },
+  { value: 'Pacific/Auckland', label: '(UTC+12:00) Auckland' },
+]
+
 export default function SettingsPage() {
   const { user } = useAuthContext()
   const { subscriptions } = useSubscriptions()
@@ -273,6 +300,34 @@ export default function SettingsPage() {
                   <option value={3}>3 days</option>
                   <option value={5}>5 days</option>
                   <option value={7}>1 week</option>
+                </select>
+              </div>
+
+              {/* Timezone selector */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-sm ${isDark ? 'text-white' : 'text-black'}`}>Timezone</p>
+                  <p className={`text-xs mt-0.5 ${isDark ? 'text-[#555555]' : 'text-gray-600'}`}>
+                    Email reminders arrive at 9 AM in your timezone
+                  </p>
+                </div>
+                <select
+                  value={preferences.timezone || 'UTC'}
+                  onChange={(e) =>
+                    updatePreferences({ timezone: e.target.value })
+                  }
+                  disabled={prefsSaving}
+                  className={`rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors appearance-none min-w-[220px] ${
+                    isDark
+                      ? 'bg-[#0D0D0D] border border-[#1F1F1F] text-white focus:border-[#555555]'
+                      : 'bg-white border border-gray-300 text-black focus:border-gray-500'
+                  }`}
+                >
+                  {TIMEZONES.map((tz) => (
+                    <option key={tz.value} value={tz.value}>
+                      {tz.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

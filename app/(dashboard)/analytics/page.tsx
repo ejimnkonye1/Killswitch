@@ -9,6 +9,7 @@ import { SpendingPieChart } from '@/components/analytics/SpendingPieChart'
 import { SpendingLineChart } from '@/components/analytics/SpendingLineChart'
 import { InsightsCard } from '@/components/analytics/InsightsCard'
 import { SavingsCalculator } from '@/components/analytics/SavingsCalculator'
+import AnalyticsLoading from './loading'
 
 export default function AnalyticsPage() {
   const { isDark } = useTheme()
@@ -29,13 +30,7 @@ export default function AnalyticsPage() {
   }, [subscriptions, loading])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className={`w-6 h-6 border-2 rounded-full animate-spin ${
-          isDark ? 'border-[#222222] border-t-white' : 'border-gray-300 border-t-black'
-        }`} />
-      </div>
-    )
+    return <AnalyticsLoading />
   }
 
   return (

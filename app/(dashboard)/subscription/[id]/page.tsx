@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getSubscription } from '@/lib/supabase/queries'
 import { DetailView } from '@/components/subscription/DetailView'
+import SubscriptionDetailLoading from './loading'
 import type { Subscription } from '@/lib/types'
 
 export default function SubscriptionDetailPage() {
@@ -29,11 +30,7 @@ export default function SubscriptionDetailPage() {
   }, [params.id])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-[#222222] border-t-white rounded-full animate-spin" />
-      </div>
-    )
+    return <SubscriptionDetailLoading />
   }
 
   if (error || !subscription) {

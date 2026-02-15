@@ -24,6 +24,7 @@ import { ExtensionStatus } from '@/components/dashboard/ExtensionStatus'
 import { EmailReceiptScanner } from '@/components/dashboard/EmailReceiptScanner'
 import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown'
 import { deleteSubscription } from '@/lib/supabase/queries'
+import DashboardLoading from './loading'
 import type { Subscription } from '@/lib/types'
 
 export default function DashboardPage() {
@@ -79,11 +80,7 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className={`w-6 h-6 border-2 rounded-full animate-spin ${isDark ? 'border-[#222222] border-t-white' : 'border-gray-300 border-t-black'}`} />
-      </div>
-    )
+    return <DashboardLoading />
   }
 
   return (

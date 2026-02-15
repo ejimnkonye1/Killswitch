@@ -62,6 +62,7 @@ export interface UserPreferences {
   email_reminders_trial: boolean
   in_app_reminders: boolean
   reminder_days_before: ReminderDaysBefore
+  timezone: string
   currency: Currency
   budget_enabled: boolean
   monthly_budget: number | null
