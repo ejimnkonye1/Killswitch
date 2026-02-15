@@ -33,6 +33,7 @@ export async function GET(request: Request) {
       .lte('reminder_date', now)
 
     if (fetchError) {
+      console.error('[send-reminders] Failed to fetch reminders:', fetchError.message)
       return NextResponse.json({ error: fetchError.message }, { status: 500 })
     }
 
@@ -57,6 +58,7 @@ export async function GET(request: Request) {
       const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId)
 
       if (userError || !userData?.user?.email) {
+        console.error(`[send-reminders] Could not get email for user ${userId}:`, userError?.message)
         errors.push(`Could not get email for user ${userId}`)
         continue
       }
@@ -165,6 +167,7 @@ export async function GET(request: Request) {
 
         sentCount += filteredReminders.length
       } catch (emailError: any) {
+        console.error(`[send-reminders] Failed to send email to ${email}:`, emailError.message)
         errors.push(`Failed to send email to ${email}: ${emailError.message}`)
       }
     }
@@ -175,6 +178,7 @@ export async function GET(request: Request) {
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error: any) {
+    console.error('[send-reminders] Unhandled error:', error.message, error.stack)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
