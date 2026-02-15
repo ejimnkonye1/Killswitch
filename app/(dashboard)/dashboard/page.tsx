@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiPlus } from 'react-icons/fi'
 import { useTheme } from '@/lib/theme-context'
-import { useSubscriptions } from '@/hooks/useSubscriptions'
-import { usePreferences } from '@/hooks/usePreferences'
+import { useSubscriptionsContext } from '@/contexts/SubscriptionsContext'
+import { usePreferencesContext } from '@/contexts/PreferencesContext'
 import { usePriceTrends } from '@/hooks/usePriceTrends'
 import { StatsCards } from '@/components/dashboard/StatsCards'
 import { SpendingChart } from '@/components/dashboard/SpendingChart'
@@ -38,8 +38,8 @@ export default function DashboardPage() {
     totalYearlyProjection,
     activeCount,
     cancelledSavings,
-  } = useSubscriptions()
-  const { preferences } = usePreferences()
+  } = useSubscriptionsContext()
+  const { preferences } = usePreferencesContext()
   const { trends: priceTrends } = usePriceTrends()
 
   const showBudget = preferences.budget_enabled && preferences.monthly_budget && preferences.monthly_budget > 0

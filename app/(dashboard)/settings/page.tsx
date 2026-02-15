@@ -6,8 +6,8 @@ import { FiLoader, FiDownload, FiUpload, FiAlertTriangle, FiSun, FiMoon } from '
 import { useAuthContext } from '@/components/auth/AuthProvider'
 import { useTheme } from '@/lib/theme-context'
 import { updatePassword } from '@/lib/supabase/auth'
-import { useSubscriptions } from '@/hooks/useSubscriptions'
-import { usePreferences } from '@/hooks/usePreferences'
+import { useSubscriptionsContext } from '@/contexts/SubscriptionsContext'
+import { usePreferencesContext } from '@/contexts/PreferencesContext'
 import { Switch } from '@/components/ui/switch'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -44,8 +44,8 @@ const TIMEZONES = [
 
 export default function SettingsPage() {
   const { user } = useAuthContext()
-  const { subscriptions } = useSubscriptions()
-  const { preferences, loading: prefsLoading, saving: prefsSaving, updatePreferences } = usePreferences()
+  const { subscriptions } = useSubscriptionsContext()
+  const { preferences, loading: prefsLoading, saving: prefsSaving, updatePreferences } = usePreferencesContext()
   const { isDark, toggleTheme } = useTheme()
   const router = useRouter()
 

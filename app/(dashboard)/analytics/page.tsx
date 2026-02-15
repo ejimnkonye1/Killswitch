@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '@/lib/theme-context'
-import { useSubscriptions } from '@/hooks/useSubscriptions'
+import { useSubscriptionsContext } from '@/contexts/SubscriptionsContext'
 import { getSpendingByCategory } from '@/lib/supabase/queries'
 import { SpendingPieChart } from '@/components/analytics/SpendingPieChart'
 import { SpendingLineChart } from '@/components/analytics/SpendingLineChart'
@@ -13,7 +13,7 @@ import AnalyticsLoading from './loading'
 
 export default function AnalyticsPage() {
   const { isDark } = useTheme()
-  const { subscriptions, loading } = useSubscriptions()
+  const { subscriptions, loading } = useSubscriptionsContext()
   const [categoryData, setCategoryData] = useState<{ name: string; value: number }[]>([])
   const [categoryLoading, setCategoryLoading] = useState(true)
 

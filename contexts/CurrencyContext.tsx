@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, ReactNode } from 'react'
-import { usePreferences } from '@/hooks/usePreferences'
+import { usePreferencesContext } from '@/contexts/PreferencesContext'
 import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from '@/lib/currency'
 import type { Currency } from '@/lib/types'
 
@@ -18,7 +18,7 @@ const CurrencyContext = createContext<CurrencyContextType>({
 })
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const { preferences } = usePreferences()
+  const { preferences } = usePreferencesContext()
   const currency = preferences.currency || 'USD'
 
   const formatAmount = (amount: number) => formatCurrencyUtil(amount, currency)

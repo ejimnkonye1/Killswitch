@@ -5,6 +5,8 @@ import { FiMenu } from 'react-icons/fi'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { CurrencyProvider } from '@/contexts/CurrencyContext'
+import { SubscriptionsProvider } from '@/contexts/SubscriptionsContext'
+import { PreferencesProvider } from '@/contexts/PreferencesContext'
 import { useTheme } from '@/lib/theme-context'
 
 export default function DashboardLayout({
@@ -56,9 +58,13 @@ export default function DashboardLayout({
           sidebarCollapsed ? 'lg:ml-[68px]' : 'lg:ml-64'
         }`}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-            <CurrencyProvider>
-              {children}
-            </CurrencyProvider>
+            <PreferencesProvider>
+              <SubscriptionsProvider>
+                <CurrencyProvider>
+                  {children}
+                </CurrencyProvider>
+              </SubscriptionsProvider>
+            </PreferencesProvider>
           </div>
         </main>
       </div>
