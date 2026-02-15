@@ -24,6 +24,7 @@ import { ExtensionStatus } from '@/components/dashboard/ExtensionStatus'
 import { EmailReceiptScanner } from '@/components/dashboard/EmailReceiptScanner'
 import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown'
 import { deleteSubscription } from '@/lib/supabase/queries'
+import { useToast } from '@/contexts/ToastContext'
 import DashboardLoading from './loading'
 import type { Subscription } from '@/lib/types'
 
@@ -43,8 +44,7 @@ export default function DashboardPage() {
   const { trends: priceTrends } = usePriceTrends()
 
   const showBudget = preferences.budget_enabled && preferences.monthly_budget && preferences.monthly_budget > 0
-
-
+  const { toast } = useToast()
 
   const [isModalOpening, setIsModalOpening] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -68,9 +68,12 @@ export default function DashboardPage() {
     setDeleteError(null)
     const { error } = await deleteSubscription(id)
     if (error) {
-      setDeleteError(typeof error === 'object' && 'message' in error ? error.message : 'Failed to delete')
+      const msg = typeof error === 'object' && 'message' in error ? error.message : 'Failed to delete'
+      setDeleteError(msg)
+      toast(msg, 'error')
     } else {
       refetch()
+      toast('Subscription deleted', 'success')
     }
   }
 

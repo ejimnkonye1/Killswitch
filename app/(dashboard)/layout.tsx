@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/dashboard/Sidebar'
 import { CurrencyProvider } from '@/contexts/CurrencyContext'
 import { SubscriptionsProvider } from '@/contexts/SubscriptionsContext'
 import { PreferencesProvider } from '@/contexts/PreferencesContext'
+import { ToastProvider } from '@/contexts/ToastContext'
 import { useTheme } from '@/lib/theme-context'
 
 export default function DashboardLayout({
@@ -20,6 +21,7 @@ export default function DashboardLayout({
 
   return (
     <AuthProvider>
+      <ToastProvider>
       <div className={isDark ? 'min-h-screen bg-black' : 'min-h-screen bg-white'}>
         {/* Mobile top bar */}
         <div className={`fixed top-0 left-0 right-0 h-14 flex items-center px-4 z-30 lg:hidden ${
@@ -68,6 +70,7 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+      </ToastProvider>
     </AuthProvider>
   )
 }

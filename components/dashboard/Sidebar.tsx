@@ -14,6 +14,7 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { signOut } from '@/lib/supabase/auth'
 import { useAuthContext } from '@/components/auth/AuthProvider'
 import { useTheme } from '@/lib/theme-context'
+import { useToast } from '@/contexts/ToastContext'
 import { ReminderBell } from '@/components/reminders/ReminderBell'
 
 const navItems = [
@@ -34,9 +35,11 @@ export function Sidebar({ isOpen, onClose, collapsed, onToggleCollapse }: Sideba
   const router = useRouter()
   const { user } = useAuthContext()
   const { isDark } = useTheme()
+  const { toast } = useToast()
 
   const handleSignOut = async () => {
     onClose()
+    toast('Signed out', 'success')
     await signOut()
     router.push('/login')
     router.refresh()

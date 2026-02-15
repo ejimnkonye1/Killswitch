@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { CURRENCIES } from '@/lib/currency'
 import { ImportModal } from '@/components/dashboard/ImportModal'
+import { useToast } from '@/contexts/ToastContext'
 import type { Currency } from '@/lib/types'
 
 const TIMEZONES = [
@@ -48,11 +49,11 @@ export default function SettingsPage() {
   const { preferences, loading: prefsLoading, saving: prefsSaving, updatePreferences } = usePreferencesContext()
   const { isDark, toggleTheme } = useTheme()
   const router = useRouter()
+  const { toast } = useToast()
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [passwordLoading, setPasswordLoading] = useState(false)
-  const [passwordMessage, setPasswordMessage] = useState('')
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -70,15 +71,14 @@ export default function SettingsPage() {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
-    setPasswordMessage('')
 
     if (newPassword !== confirmNewPassword) {
-      setPasswordMessage('Passwords do not match')
+      toast('Passwords do not match', 'error')
       return
     }
 
     if (newPassword.length < 6) {
-      setPasswordMessage('Password must be at least 6 characters')
+      toast('Password must be at least 6 characters', 'error')
       return
     }
 
@@ -86,9 +86,9 @@ export default function SettingsPage() {
     const { error } = await updatePassword(newPassword)
 
     if (error) {
-      setPasswordMessage(error.message)
+      toast(error.message, 'error')
     } else {
-      setPasswordMessage('Password updated successfully')
+      toast('Password updated successfully', 'success')
       setNewPassword('')
       setConfirmNewPassword('')
     }
@@ -104,6 +104,7 @@ export default function SettingsPage() {
     a.download = 'subtracker-export.json'
     a.click()
     URL.revokeObjectURL(url)
+    toast('Data exported successfully', 'success')
   }
 
   const handleDeleteAccount = async () => {
@@ -119,6 +120,7 @@ export default function SettingsPage() {
 
     await supabase.auth.signOut()
     setDeleteLoading(false)
+    toast('Account deleted', 'success')
     router.push('/login')
     router.refresh()
   }
@@ -545,10 +547,6 @@ export default function SettingsPage() {
                 }`}
               />
             </div>
-
-            {passwordMessage && (
-              <p className={`text-xs ${isDark ? 'text-[#999999]' : 'text-gray-600'}`}>{passwordMessage}</p>
-            )}
 
             <button
               type="submit"
